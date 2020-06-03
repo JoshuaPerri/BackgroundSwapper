@@ -1,0 +1,4 @@
+#/bin/bash
+picturePath=$1
+
+gsettings set org.gnome.desktop.background picture-uri $picturePath
