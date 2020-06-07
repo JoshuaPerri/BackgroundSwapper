@@ -1,87 +1,6 @@
 #include "background.h"
 
-/*image *createList(int size) {
-    image *imageList = malloc(sizeof(image) * size);
-    return(imageList);
-}*/
-
-/*image *fillList(image *imageList, FILE *file, int size) {
-    char current[200];
-    char c;
-    int i, j, k;
-
-    while (c = fgetc(file) != EOF) {
-        if (c == '{') {
-            while (c = fgetc(file) != '}') {
-                j=0;
-                if (c == '=') {
-                    current[j] = c;
-                } else {    
-                    current[j] = '\0';
-                    j++;
-                }
-                    
-            }
-            i++;
-        }
-    }
-
-    for (i = 0; i < size; i++) {
-        for (j = 0; j < 4; j++) {
-            while (fgetc(file) != '{') {}
-
-            k = 0;
-            while ((c = fgetc(file)) != '}') {
-                current[k] = c;
-                k++;
-            }
-            current[k] = '\0';
-
-            switch (j) {
-
-                case 0:
-                    imageList[i].number = atoi(c);
-                case 1:
-                    strcpy(imageList[i].imageName, current);
-                case 2:
-                    strcpy(imageList[i].imagePath, current);
-
-            }
-
-        }
-    } 
-} */
-
-/*void trim(char *string) {
-    int i, j;
-
-    i = 0;
-    while (string[i] == ' ') {
-
-        j = 0;
-        while (string[j+1] != '\0') {
-            string[j] = string[j+1];
-            j++;
-        }
-
-        i++;
-        }
-    }
-
-    i = 0;
-    while (string[i] != '\0') {
-        i++;
-    }
-    i--;
-
-    while (string[i] == ' ') {
-
-        string[i] = '\0';
-        i--;
-    }
-
-}*/
-
+// Generates a random integer between min and max
 int randInt(int min, int max) {
     int r;
 
@@ -92,3 +11,108 @@ int randInt(int min, int max) {
     return (r);
 }
 
+// 
+void controller() {
+    int choice, size;
+    FILE *file = fopen("data", "r");
+    image *imageList;
+
+    if (file == NULL) {
+        exit(0);
+    }
+
+    size = getSize(file);
+    imageList = createList(size);
+    fillList(imageList, file, size);
+
+    fclose(file);
+
+
+
+    printf("Welcome to background picker!\n");
+
+    printf("\n");
+    printf("Please type the number for the option you want:\n");
+    printf("1. Pick a background\n");
+    printf("2. Add a background\n");
+    //printf("3. Cycle backgrounds\n");
+
+    while (TRUE) {
+        fscanf(stdin, "%d", &choice);
+
+        if ((choice >= 1) && (choice <= 2)) {
+            break;
+        }
+
+        printf("That number is not an option, try again:");
+
+    }
+
+    switch(choice) {
+        case 1:
+            pickBackground(imageList, size);
+            break;
+        case 2:
+            addBackground(imageList, size);
+            break;
+        default:
+            break;
+    }
+
+    free(imageList);
+
+}
+
+// Controls the pick background option
+void pickBackground(image *imageList, int size) {
+    char scriptPath[200] = "./changeScript ";
+    int choice;
+
+    printf("The available backgrounds are:\n");
+    printAll(imageList, size);
+    printf("Please enter the number of the image you want:");
+
+    while (TRUE) {
+        fscanf(stdin, "%d", &choice);
+
+        if ((choice >= 1) && (choice <= size)) {
+            choice--;
+            break;
+        }
+
+        printf("That number is not an option, try again:");
+
+    }
+    strcat(scriptPath, imageList[choice].path);
+
+    printf("%s\n", scriptPath);
+
+    system(scriptPath);
+
+}
+
+// Prints all the images in the list
+void printAll(image *imageList, int size) {
+    for (int i = 0; i < size; i++) {
+        printf(" %d - %s\n", imageList[i].num, imageList[i].path);
+    }
+}
+
+// Controls the add background option
+void addBackground(image *imageList, int size) {
+    char imageName[200];
+    FILE *file;
+    printf("Please enter the exact name of the image you want to add:\n");
+    fscanf(stdin, "%s", imageName);
+    file = fopen("data", "a");
+
+    if (file == NULL) {
+        exit(0);
+    }
+
+    fprintf(file, "\n%d, %s", size+1, imageName);
+    printf("Please add the file to the image folder\n");
+
+    fclose(file);
+
+}

@@ -1,4 +1,11 @@
 #/bin/bash
-picturePath=$1
+pictureName=$1
 
-gsettings set org.gnome.desktop.background picture-uri $picturePath
+full_path=$(realpath $0)
+dir_path=$(dirname $full_path)
+echo $dir_path
+
+dir_path="${dir_path}/Images/${pictureName}"
+echo $dir_path
+
+gsettings set org.gnome.desktop.background picture-uri $dir_path
